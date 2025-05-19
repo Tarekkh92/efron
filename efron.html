@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulate dice game outcomes</title>
+
+  <style>
+    body {
+  font-family: 'Arial';
+  direction: rtl;
+}
+
+  </style>
+
+  
+</head>
+<body>
+  <h2>משחק קוביות אפרון + קובייה רגילה</h2>
+<label>שחקן 1 בוחר קובייה:
+  <select id="player1">
+    <option value="R">רגילה</option>
+    <option value="A">א</option>
+    <option value="B">ב</option>
+    <option value="C">ג</option>
+    <option value="D">ד</option>
+  </select>
+</label>
+<br />
+<label>שחקן 2 בוחר קובייה:
+  <select id="player2">
+    <option value="R">רגילה</option>
+    <option value="A">א</option>
+    <option value="B">ב</option>
+    <option value="C">ג</option>
+    <option value="D">ד</option>
+  </select>
+</label>
+<br /><br />
+<button onclick="play()">שחק!</button>
+<p id="result"></p>
+<button onclick="simulate()">הרץ 1000 משחקים</button>
+<p id="simulationResult"></p>
+
+
+  <script>
+    const dice = {
+  R: [1, 2, 3, 4, 5, 6],          // רגילה
+  A: [0, 0, 4, 4, 4, 4],          // אפרון א
+  B: [3, 3, 3, 3, 3, 3],          // אפרון ב
+  C: [2, 2, 2, 2, 6, 6],          // אפרון ג
+  D: [1, 1, 1, 5, 5, 5]           // אפרון ד
+};
+
+function roll(die) {
+  const faces = dice[die];
+  const index = Math.floor(Math.random() * faces.length);
+  return faces[index];
+}
+
+function play() {
+  const p1 = document.getElementById("player1").value;
+  const p2 = document.getElementById("player2").value;
+
+  const roll1 = roll(p1);
+  const roll2 = roll(p2);
+
+  let winner = "תיקו!";
+  if (roll1 > roll2) winner = "שחקן 1 מנצח!";
+  else if (roll2 > roll1) winner = "שחקן 2 מנצח!";
+
+  document.getElementById("result").innerText =
+    `שחקן 1 (קובייה ${p1}): ${roll1} \nשחקן 2 (קובייה ${p2}): ${roll2} \n${winner}`;
+}
+function simulate() {
+  const p1 = document.getElementById("player1").value;
+  const p2 = document.getElementById("player2").value;
+
+  let wins1 = 0, wins2 = 0, ties = 0;
+
+  for (let i = 0; i < 1000; i++) {
+    const roll1 = roll(p1);
+    const roll2 = roll(p2);
+
+    if (roll1 > roll2) wins1++;
+    else if (roll2 > roll1) wins2++;
+    else ties++;
+  }
+
+  const percent = (x) => ((x / 1000) * 100).toFixed(1) + "%";
+
+  document.getElementById("simulationResult").innerText =
+    `שחקן 1 (קובייה ${p1}) ניצח ב- ${percent(wins1)} מהפעמים\n` +
+    `שחקן 2 (קובייה ${p2}) ניצח ב- ${percent(wins2)} מהפעמים\n` +
+    `תיקו התרחש ב- ${percent(ties)} מהפעמים`;
+}
+  </script>
+</body>
+</html>
