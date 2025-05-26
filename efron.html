@@ -5,12 +5,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Simulate dice game outcomes</title>
+  <title>JSFiddle k50ybcsd</title>
 
   <style>
     body {
-  font-family: 'Arial';
-  direction: rtl;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+#quizContainer {
+  margin-top: 20px;
+}
+
+#questionContainer {
+  margin-bottom: 10px;
+}
+
+#choices {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 5px;
+}
+
+#submitBtn {
+  padding: 5px 10px;
+}
+
+#resultContainer {
+  margin-top: 20px;
 }
 
   </style>
@@ -18,84 +47,125 @@
   
 </head>
 <body>
-  <h2>משחק קוביות אפרון + קובייה רגילה</h2>
-<label>שחקן 1 בוחר קובייה:
-  <select id="player1">
-    <option value="R">רגילה</option>
-    <option value="A">א</option>
-    <option value="B">ב</option>
-    <option value="C">ג</option>
-    <option value="D">ד</option>
-  </select>
-</label>
-<br />
-<label>שחקן 2 בוחר קובייה:
-  <select id="player2">
-    <option value="R">רגילה</option>
-    <option value="A">א</option>
-    <option value="B">ב</option>
-    <option value="C">ג</option>
-    <option value="D">ד</option>
-  </select>
-</label>
-<br /><br />
-<button onclick="play()">שחק!</button>
-<p id="result"></p>
-<button onclick="simulate()">הרץ 1000 משחקים</button>
-<p id="simulationResult"></p>
+  <!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz Application</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <h1>Quiz Application</h1>
+  <div id="quizContainer">
+    <div id="questionContainer">
+      <p id="question"></p>
+      <ul id="choices"></ul>
+    </div>
+    <button id="submitBtn">Submit</button>
+  </div>
+  <div id="resultContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
 
   <script>
-    const dice = {
-  R: [1, 2, 3, 4, 5, 6],          // רגילה
-  A: [0, 0, 4, 4, 4, 4],          // אפרון א
-  B: [3, 3, 3, 3, 3, 3],          // אפרון ב
-  C: [2, 2, 2, 2, 6, 6],          // אפרון ג
-  D: [1, 1, 1, 5, 5, 5]           // אפרון ד
-};
+    // Define quiz questions
+const questions = [
+  {
+    question: "What is the capital of France?",
+    choices: ["Paris", "London", "Berlin", "Rome"],
+    correctAnswer: 0
+  },
+  {
+    question: "Which planet is known as the Red Planet?",
+    choices: ["Mars", "Jupiter", "Saturn", "Venus"],
+    correctAnswer: 0
+  },
+  {
+    question: "Who painted the Mona Lisa?",
+    choices: ["Leonardo da Vinci", "Pablo Picasso", "Vincent van Gogh", "Claude Monet"],
+    correctAnswer: 0
+  }
+];
 
-function roll(die) {
-  const faces = dice[die];
-  const index = Math.floor(Math.random() * faces.length);
-  return faces[index];
+// Get necessary elements
+const questionElement = document.getElementById("question");
+const choicesElement = document.getElementById("choices");
+const submitBtn = document.getElementById("submitBtn");
+const resultContainer = document.getElementById("resultContainer");
+
+let currentQuestion = 0;
+let score = 0;
+
+// Load the first question
+function loadQuestion() {
+  const question = questions[currentQuestion];
+  questionElement.textContent = question.question;
+
+  choicesElement.innerHTML = "";
+
+  for (let i = 0; i < question.choices.length; i++) {
+    const li = document.createElement("li");
+    li.textContent = question.choices[i];
+    li.onclick = checkAnswer;
+    choicesElement.appendChild(li);
+  }
 }
 
-function play() {
-  const p1 = document.getElementById("player1").value;
-  const p2 = document.getElementById("player2").value;
+// Check the selected answer
+function checkAnswer() {
+  const question = questions[currentQuestion];
+  const selectedChoice = event.target;
+  const selectedAnswer = Array.from(choicesElement.children).indexOf(selectedChoice);
 
-  const roll1 = roll(p1);
-  const roll2 = roll(p2);
-
-  let winner = "תיקו!";
-  if (roll1 > roll2) winner = "שחקן 1 מנצח!";
-  else if (roll2 > roll1) winner = "שחקן 2 מנצח!";
-
-  document.getElementById("result").innerText =
-    `שחקן 1 (קובייה ${p1}): ${roll1} \nשחקן 2 (קובייה ${p2}): ${roll2} \n${winner}`;
-}
-function simulate() {
-  const p1 = document.getElementById("player1").value;
-  const p2 = document.getElementById("player2").value;
-
-  let wins1 = 0, wins2 = 0, ties = 0;
-
-  for (let i = 0; i < 1000; i++) {
-    const roll1 = roll(p1);
-    const roll2 = roll(p2);
-
-    if (roll1 > roll2) wins1++;
-    else if (roll2 > roll1) wins2++;
-    else ties++;
+  if (selectedAnswer === question.correctAnswer) {
+    selectedChoice.classList.add("correct");
+    score++;
+  } else {
+    selectedChoice.classList.add("incorrect");
   }
 
-  const percent = (x) => ((x / 1000) * 100).toFixed(1) + "%";
-
-  document.getElementById("simulationResult").innerText =
-    `שחקן 1 (קובייה ${p1}) ניצח ב- ${percent(wins1)} מהפעמים\n` +
-    `שחקן 2 (קובייה ${p2}) ניצח ב- ${percent(wins2)} מהפעמים\n` +
-    `תיקו התרחש ב- ${percent(ties)} מהפעמים`;
+  disableChoices();
+  showNextQuestion();
 }
+
+// Disable the answer choices
+function disableChoices() {
+  const choices = choicesElement.children;
+
+  for (let i = 0; i < choices.length; i++) {
+    choices[i].onclick = null;
+    choices[i].classList.add("disabled");
+  }
+}
+
+// Show the next question or the final result
+function showNextQuestion() {
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    submitBtn.disabled = true;
+    setTimeout(() => {
+      loadQuestion();
+      submitBtn.disabled = false;
+    }, 1000);
+  } else {
+    showResult();
+  }
+}
+
+// Show the quiz result
+function showResult() {
+  resultContainer.innerHTML = `
+    <h2>Quiz Result</h2>
+    <p>You scored ${score} out of ${questions.length}.</p>
+  `;
+}
+
+// Start the quiz
+loadQuestion();
+
   </script>
 </body>
 </html>
